@@ -38,8 +38,8 @@ def retrieve_leafs(xmlfilename):
             # and look for matching non-self closing tag, we do not add self closing tags to the stack
 
             if opentag:
-                #Add the tag name to the stack to compare with closing tag name
-                stack.append(opentag.group(1))
+                #Add the line number to the stack to help with retrieving bounds
+                stack.append(num)
 
             elif selfclosetag:
                 # If it is a self closed tag, extract the bounds immediately as it is 
@@ -53,7 +53,7 @@ def retrieve_leafs(xmlfilename):
                 # if it does match, it is a leaf
                 # pop and retrieve the bounds utilizing the line number from the opening tag
                 if stack and stack[-1][0] == closedtag.group(1):
-                    tagname,openlinenum = stack.pop()
+                    openlinenum = stack.pop()
                     # if the opening tag number is one line before the closing tag, it is the
                     # corresponding closing tag so we retrieve the bounds of the leaf
                     if openlinenum == num - 1:
@@ -61,7 +61,7 @@ def retrieve_leafs(xmlfilename):
                         leafs.append(bounds)
     return leafs
 
-def highlightLeafs(image,coords):
+def highlightLeafs(image,coords,outputDirectory = 'GeneratedPNGs'):
     # First retrieve image file and open it with PIL library then create a Draw object to draw 
     # boxes on the existing images
     png = Image.open(image)
@@ -73,16 +73,16 @@ def highlightLeafs(image,coords):
 
     # Save the highlighted image as a new image in the GeneratedPNGs folder
     nonhighlightedname = os.path.splitext(image)[0]
-    highlightednamepath = os.path.join('GeneratedPNGs',f"{nonhighlightedname}_highlighted.png")
+    highlightednamepath = os.path.join(outputDirectory,f"{nonhighlightedname}_highlighted.png")
 
     png.save(highlightednamepath)
-    print("Saved ",highlightednamepath," in Generated PNGs folder ")
+    print("Saved ",highlightednamepath," in output directory ")
     return
     
 
 
 
-def main(directory = '\Programming-Assignment-Data\Programming-Assignment-Data'):
+def MatchandHighlight(directory = '\Programming-Assignment-Data\Programming-Assignment-Data'):
     #First, Retrieve all files ending in .xml files from input folder and put them in a list
     xmls = glob.glob(os.path.join(directory,"*.xml"))
 
@@ -101,10 +101,12 @@ def main(directory = '\Programming-Assignment-Data\Programming-Assignment-Data')
             highlightLeafs(pngmatchname,boundset)
 
         else:
+            # if png doesn't exist, notify user
             print(pngmatchname,"does not exist in input Directory! Please name file accordingly for highlighting")
     return
 
 
-main()
+if __name__ == "__main__":
+    MatchandHighlight()
 
 
