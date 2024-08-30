@@ -2,8 +2,17 @@ from PIL import Image, ImageDraw
 import glob
 import re
 
-def retrieve_bounds(leaf):
-    pass
+def retrieve_bounds(line):
+    # Simple regex to recognize and retrieve bounds based on pattern
+    bounds = re.search(r'bounds="(\[(\d)+,(\d)+\]\[(\d)+,(\d)+\]"',line)
+    #Once retrieved, we must get each individual coordinate from the capturing groups and convert
+    # them to integers for drawing later
+    north = int(bounds.groupd(2))
+    south = int(bounds.groups(4))
+    east = int(bounds.groups(3))
+    west = int(bounds.groups(1))
+    return (west,north,east,south)
+
 
 def retrieve_leafs(xmlfilename):
     #Initialize an array to store the leaf bounds
