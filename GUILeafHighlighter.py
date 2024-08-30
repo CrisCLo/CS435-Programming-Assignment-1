@@ -73,9 +73,9 @@ def highlightLeafs(image,coords):
 
     # Save the highlighted image as a new image in the GeneratedPNGs folder
     nonhighlightedname = os.path.splitext(image)
-    highlightedname = f"{nonhighlightedname}_highlighted.png"
+    highlightednamepath = os.path.join('GeneratedPNGs',f"{nonhighlightedname}_highlighted.png")
 
-    png.save(highlightedname)
+    png.save(highlightednamepath)
 
     return
     
