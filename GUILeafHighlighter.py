@@ -1,6 +1,7 @@
 from PIL import Image, ImageDraw
 import glob
 import re
+import os
 
 def retrieve_bounds(line):
     # Simple regex to recognize and retrieve bounds based on pattern
@@ -60,12 +61,31 @@ def retrieve_leafs(xmlfilename):
                         leafs.append(bounds)
     return leafs
 
+def highlightLeafs(image,coords):
+    # First retrieve image file and open it with PIL library then create a Draw object to draw 
+    # boxes on the existing images
+    png = Image.open(image)
+    highlight = ImageDraw.Draw(png)
+
+    # Highlight each of the leaf nodes in the given list with a yellow box
+    for boundset in coords:
+        highlight.rectangle(boundset,outline = "yellow",width = 3)
+
+    # Save the highlighted image as a new image in the GeneratedPNGs folder
+    nonhighlightedname = os.path.splitext(image)
+    highlightedname = f"{nonhighlightedname}_highlighted.png"
+
+    png.save(highlightedname)
+
+    return
+    
+
+
 
 def matchFiles(directory = '\Programming-Assignment-Data\Programming-Assignment-Data'):
     pass
 
-def highlightLeafs(xmlfilename,image,coords):
-    pass
+
 
 def main():
     pass
