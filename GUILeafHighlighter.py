@@ -72,20 +72,39 @@ def highlightLeafs(image,coords):
         highlight.rectangle(boundset,outline = "yellow",width = 3)
 
     # Save the highlighted image as a new image in the GeneratedPNGs folder
-    nonhighlightedname = os.path.splitext(image)
+    nonhighlightedname = os.path.splitext(image)[0]
     highlightednamepath = os.path.join('GeneratedPNGs',f"{nonhighlightedname}_highlighted.png")
 
     png.save(highlightednamepath)
-
+    print("Saved ",highlightednamepath," in Generated PNGs folder ")
     return
     
 
 
 
-def matchFiles(directory = '\Programming-Assignment-Data\Programming-Assignment-Data'):
-    pass
+def main(directory = '\Programming-Assignment-Data\Programming-Assignment-Data'):
+    #First, Retrieve all files ending in .xml files from input folder and put them in a list
+    xmls = glob.glob(os.path.join(directory,"*.xml"))
+
+    #For each xml, determine if it's pair exists within the directory and notify the user
+    # if it does not
+    for xml in xmls:
+        # Get file name with no extension
+        basefilename = os.path.splitext(xml)[0]
+        pngmatchname = os.path.join(directory,f"{basefilename}.png")
+
+        #Verify that matching PNG file exists within directory and if it does
+        # extract the bounds of the leaf components with other nested functions
+        if os.path.exists(pngmatchname):
+            boundset = retrieve_leafs(xml)
+            # once bounds are retrieved, highlight the png image accordingly
+            highlightLeafs(pngmatchname,boundset)
+
+        else:
+            print(pngmatchname,"does not exist in input Directory! Please name file accordingly for highlighting")
+    return
 
 
+main()
 
-def main():
-    pass
+
