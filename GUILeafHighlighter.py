@@ -6,7 +6,7 @@ def retrieve_bounds(line):
     # Simple regex to recognize and retrieve bounds based on pattern
     bounds = re.search(r'bounds="(\[(\d)+,(\d)+\]\[(\d)+,(\d)+\]"',line)
     #Once retrieved, we must get each individual coordinate from the capturing groups and convert
-    # them to integers for drawing later
+    # them to integers within a tuple for drawing later
     north = int(bounds.groupd(2))
     south = int(bounds.groups(4))
     east = int(bounds.groups(3))
@@ -61,3 +61,11 @@ def retrieve_leafs(xmlfilename):
     return leafs
 
 
+def matchFiles(directory = '\Programming-Assignment-Data\Programming-Assignment-Data'):
+    pass
+
+def highlightLeafs(xmlfilename,image,coords):
+    pass
+
+def main():
+    pass
