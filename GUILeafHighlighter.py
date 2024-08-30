@@ -1,4 +1,3 @@
-import xml.etree.ElementTree as ET
 from PIL import Image, ImageDraw
 import glob
 import re
@@ -40,12 +39,15 @@ def retrieve_leafs(xmlfilename):
             
             elif closedtag:
                 #If closing tag, verify that top of stack contains matching open tag
-                #if it does not contain the match, it is not a leaf
-                # if it does match, pop
+                #if it does not contain the match, continue because it could be a nested
+                # if it does match, it is a leaf
+                # pop and retrieve the bounds utilizing the line number from the opening tag
                 if stack and stack[-1][0] == closedtag.group(1):
-                    linenum = stack.pop()
-                    if linenum == num - 1:
-                        bounds = retrieve_bounds(lines[linenum])
+                    tagname,openlinenum = stack.pop()
+                    # if the opening tag number is one line before the closing tag, it is the
+                    # corresponding closing tag so we retrieve the bounds of the leaf
+                    if openlinenum == num - 1:
+                        bounds = retrieve_bounds(lines[openlinenum])
                         leafs.append(bounds)
     return leafs
 
