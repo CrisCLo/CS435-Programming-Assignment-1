@@ -4,68 +4,71 @@ import re
 import os
 
 def retrieve_bounds(line):
-    print("In retrieve bounds")
     # Simple regex to recognize and retrieve bounds based on pattern
-    bounds = re.search(r'bounds="\[(\d)+,(\d)+\]\[(\d)+,(\d)+\]"',line)
+    bounds = re.search(r'bounds="\[(\d+),(\d+)\]\[(\d+),(\d+)\]"',line)
     #Once retrieved, we must get each individual coordinate from the capturing groups and convert
     # them to integers within a tuple for drawing later
     if bounds:
-        north = int(bounds.group(2))
-        south = int(bounds.group(4))
-        east = int(bounds.group(3))
         west = int(bounds.group(1))
+        north = int(bounds.group(2))
+        east = int(bounds.group(3))
+        south = int(bounds.group(4))
         return (west,north,east,south)
     return None
 
 def retrieve_leafs(xmlfilename):
-    print('In retrieve leafs')
-    #Initialize an array to store the leaf bounds
+    # Initialize an array to store the leaf bounds
     leafs = []
-    # Initialize a stack to track open tags to match with corresponding closing tags to
-    # identify leaf nodes
+    # Initialize a stack to track open tags to match with corresponding closing tags
     stack = []
 
-    #Open XML File for reading
-    with open(xmlfilename,'r',encoding = 'UTF-8') as file:
-        #Read file line by line to make it easier to parse
-        lines = file.readlines()
+    # Open XML File for reading
+    with open(xmlfilename, 'r', encoding='UTF-8') as file:
+        # Read file line by line to make it easier to parse
+        xmlfile = file.read()
+        # Find all tags in xml file using regex and return the matches as an iterable
+        # to be able to extract start position, tag name and whether its opening,closing or
+        # self-closing
+        tags = re.finditer(r'<(/?)(\w+)[^>]*>',xmlfile)
 
-        for num, line in enumerate(lines):
-            # Utilize simple regex to identify the tags when the lines are scanned 
-            opentag = re.search(r'<(\w+)[^>]*>',line)
-            closedtag = re.search(r'</(\w+)>',line)
-            selfclosetag = re.search(r'<(\w+)[^>]*/>',line)
+        for tag in tags:
+            startpos = tag.start()
+            tagtype = tag.group(1)
+            name = tag.group(2)
 
-            # Three different scenarios 1. self close, 2. open and 3. close tag match
-            # If a match for an open tag is found, add the tag name and line number
-            # and look for matching non-self closing tag, we do not add self closing tags to the stack
+            # Handle closing tags
+            if tagtype == '/':
+                # Verify that top of stack contains matching open tag
+                if stack and stack[-1][0] == name:
+                    tagname, openpos = stack.pop()
+                    # If the position of the opening tag on the top of the stack matches
+                    # that of the current tag's opening it is a leaf node
+                    if openpos == tag.start():
+                        # Retrieve the bounds from the tag 
+                        bounds = retrieve_bounds(xmlfile[openpos:tag.end()])
+                        if bounds:
+                            # If found, add them to the list of leafs
+                            leafs.append(bounds)
 
-            if opentag:
-                #Add the tag name to the stack to help with retrieving bounds
-                stack.append((opentag.group(1),num))
-
-            elif selfclosetag:
-                # If it is a self closed tag, extract the bounds immediately as it is 
-                # automatically a leaf node
-                bounds = retrieve_bounds(line)
-                leafs.append(bounds)
-            
-            elif closedtag:
-                #If closing tag, verify that top of stack contains matching open tag
-                #if it does not contain the match, continue because it could be a nested
-                # if it does match, it is a leaf
-                # pop and retrieve the bounds utilizing the line number from the opening tag
-                if stack and stack[-1][0] == closedtag.group(1):
-                    tagname,openlinenum = stack.pop()
-                    # if the opening tag number is one line before the closing tag, it is the
-                    # corresponding closing tag so we retrieve the bounds of the leaf
-                    if openlinenum == num - 1:
-                        bounds = retrieve_bounds(lines[openlinenum])
+            # Handle self-closing tags and opening tags based on absence of closing /
+            else:
+                # Check if entire tag ends with /> to verify if it is self-closing
+                # Self-closed tag is automatically a leaf node, so retrieve bounds from tag
+                if tag.group(0).endswith('/>'):
+                    bounds = retrieve_bounds(tag.group(0))
+                    if bounds:
                         leafs.append(bounds)
+            
+            # Handle opening tags
+                else:
+                    # Add the tag type and line number to the stack to track
+                    stack.append((name, startpos))
+
+        
+    print("Leaf nodes bounds:", leafs)
     return leafs
 
 def highlightLeafs(image,coords,outputDirectory = 'GeneratedPNGs'):
-    print('InhighlightLeafs')
     # First retrieve image file and open it with PIL library then create a Draw object to draw 
     # boxes on the existing images
     png = Image.open(image)
@@ -73,31 +76,27 @@ def highlightLeafs(image,coords,outputDirectory = 'GeneratedPNGs'):
 
     # Highlight each of the leaf nodes in the given list with a yellow box
     for boundset in coords:
-        highlight.rectangle(boundset,outline = "yellow",width = 3)
+        highlight.rectangle(boundset,outline = "yellow",width = 5)
 
     # Save the highlighted image as a new image in the GeneratedPNGs folder
     nonhighlightedname = os.path.splitext(os.path.basename(image))[0]
     highlightednamepath = os.path.join(outputDirectory,f"{nonhighlightedname}_highlighted.png")
 
     png.save(highlightednamepath)
-    print("Saved ",highlightednamepath," in output directory ")
     return
     
 
 
 
 def MatchandHighlight(directory = 'Programming-Assignment-Data\Programming-Assignment-Data'):
-    print('In MatchandHighlight')
     #First, Retrieve all files ending in .xml files from input folder and put them in a list
     xmls = glob.glob(os.path.join(directory,"*.xml"))
-    #print(xmls)
     #For each xml, determine if it's pair exists within the directory and notify the user
     # if it does not
     for xml in xmls:
         # Get file name with no extension
         basefilename = os.path.splitext(xml)[0]
         pngmatchname = os.path.join(f"{basefilename}.png")
-        #print(pngmatchname)
         #Verify that matching PNG file exists within directory and if it does
         # extract the bounds of the leaf components with other nested functions
         if os.path.exists(pngmatchname):
@@ -113,5 +112,4 @@ def MatchandHighlight(directory = 'Programming-Assignment-Data\Programming-Assig
 
 if __name__ == "__main__":
     MatchandHighlight()
-
 
