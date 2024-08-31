@@ -64,8 +64,6 @@ def retrieve_leafs(xmlfilename):
                     # Add the tag type and line number to the stack to track
                     stack.append((name, startpos))
 
-        
-    print("Leaf nodes bounds:", leafs)
     return leafs
 
 def highlightLeafs(image,coords,outputDirectory = 'GeneratedPNGs'):
@@ -83,6 +81,7 @@ def highlightLeafs(image,coords,outputDirectory = 'GeneratedPNGs'):
     highlightednamepath = os.path.join(outputDirectory,f"{nonhighlightedname}_highlighted.png")
 
     png.save(highlightednamepath)
+    print(f"{nonhighlightedname}_highlighted.png", "saved to",outputDirectory)
     return
     
 
