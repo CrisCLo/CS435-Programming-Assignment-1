@@ -41,13 +41,13 @@ def retrieve_leafs(xmlfilename):
 
             # Handle closing tags by identifying closing slash
             if tagtype == '/':
-                # Verify that top of stack contains matching open tag
-                if stack and stack[-1][0] == name:
+                # Verify that top of stack contains matching open tag and ensure it is the
+                # only remaining opening tag in the stack
+                if stack and stack[-1][0] == name and len(stack)==1:
                     tagname, openpos = stack.pop()
-                    # If the position of the closing tag comes immediately after the opening tag
-                    # it accounts for cases with tags with no content between them, indicating
-                    # a leaf node.
-                    if openpos + len(name) + 2 == tag.start():
+                    # If the tag name of the opening tag matches the tag name of the closing tag,
+                    # it is the corresponding closing tag.
+                    if tagname == tag.group(2):
                         # Retrieve the bounds from the tag 
                         bounds = retrieve_bounds(xmlfile[openpos:tag.end()])
                         if bounds:
@@ -62,9 +62,17 @@ def retrieve_leafs(xmlfilename):
                     bounds = retrieve_bounds(tag.group(0))
                     if bounds:
                         leafs.append(bounds)
+                    #Pop the stack to try to handle cases of inadvertently marking non-leafs as leafs
+                    # when dealing with nesting
+                    if stack:
+                       stack.pop()
             
             # Handle opening tags
                 else:
+                    # If an opening tag already exists on the stack, there is a nest
+                    # and thus we should remove the non-leaf open tag from the stack
+                    if stack:
+                        stack.pop()
                     # Add the tag type and line number to the stack to track
                     stack.append((name, startpos))
 
