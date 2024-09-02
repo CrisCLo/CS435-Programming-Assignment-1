@@ -31,6 +31,9 @@ def retrieve_leafs(xmlfilename):
         # self-closing
         tags = re.finditer(r'<(/?)(\w+)[^>]*>',xmlfile)
 
+        # Extract starting position, the type and name from the tag based on regex capture group
+        # The tag type is determined by the existence of the closing slash at the beginning of the
+        # tag, with the name following it in the next capture group.
         for tag in tags:
             startpos = tag.start()
             tagtype = tag.group(1)
@@ -42,8 +45,9 @@ def retrieve_leafs(xmlfilename):
                 if stack and stack[-1][0] == name:
                     tagname, openpos = stack.pop()
                     # If the position of the opening tag on the top of the stack matches
-                    # that of the current tag's opening it is a leaf node
-                    if openpos == tag.start():
+                    # that of the current tag's opening position minus one it is a leaf node since it 
+                    # immediately follows the opening tag
+                    if openpos == tag.start()-1:
                         # Retrieve the bounds from the tag 
                         bounds = retrieve_bounds(xmlfile[openpos:tag.end()])
                         if bounds:
