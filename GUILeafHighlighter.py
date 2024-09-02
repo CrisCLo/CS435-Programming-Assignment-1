@@ -45,9 +45,9 @@ def retrieve_leafs(xmlfilename):
                 if stack and stack[-1][0] == name:
                     tagname, openpos = stack.pop()
                     # If the position of the opening tag on the top of the stack matches
-                    # that of the current tag's opening position minus one it is a leaf node since it 
+                    # that of the current tag's opening position it is a leaf node since it 
                     # immediately follows the opening tag
-                    if openpos == tag.start()-1:
+                    if openpos == tag.start():
                         # Retrieve the bounds from the tag 
                         bounds = retrieve_bounds(xmlfile[openpos:tag.end()])
                         if bounds:
