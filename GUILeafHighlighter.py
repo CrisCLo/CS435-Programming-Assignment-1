@@ -47,7 +47,7 @@ def retrieve_leafs(xmlfilename):
                     # If the position of the closing tag comes immediately after the opening tag
                     # it accounts for cases with tags with no content between them, indicating
                     # a leaf node.
-                    if openpos + len(name) + 1 == tag.start():
+                    if openpos + len(name) + 2 == tag.start():
                         # Retrieve the bounds from the tag 
                         bounds = retrieve_bounds(xmlfile[openpos:tag.end()])
                         if bounds:
