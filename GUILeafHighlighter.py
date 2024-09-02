@@ -36,7 +36,7 @@ def retrieve_leafs(xmlfilename):
             tagtype = tag.group(1)
             name = tag.group(2)
 
-            # Handle closing tags
+            # Handle closing tags by identifying closing slash
             if tagtype == '/':
                 # Verify that top of stack contains matching open tag
                 if stack and stack[-1][0] == name:
@@ -76,7 +76,8 @@ def highlightLeafs(image,coords,outputDirectory = 'GeneratedPNGs'):
     for boundset in coords:
         highlight.rectangle(boundset,outline = "yellow",width = 5)
 
-    # Save the highlighted image as a new image in the GeneratedPNGs folder
+    # Save the highlighted image as a new image in the GeneratedPNGs folder by creating a new 
+    # file path
     nonhighlightedname = os.path.splitext(os.path.basename(image))[0]
     highlightednamepath = os.path.join(outputDirectory,f"{nonhighlightedname}_highlighted.png")
 
@@ -93,7 +94,7 @@ def MatchandHighlight(directory = 'Programming-Assignment-Data\Programming-Assig
     #For each xml, determine if it's pair exists within the directory and notify the user
     # if it does not
     for xml in xmls:
-        # Get file name with no extension
+        # Get file name excluding the extension to match it with corresponding PNG
         basefilename = os.path.splitext(xml)[0]
         pngmatchname = os.path.join(f"{basefilename}.png")
         #Verify that matching PNG file exists within directory and if it does
@@ -106,6 +107,7 @@ def MatchandHighlight(directory = 'Programming-Assignment-Data\Programming-Assig
         else:
             # if png doesn't exist, notify user
             print(pngmatchname,"does not exist in input Directory! Please name file accordingly for highlighting")
+    # Notify user that process has completed
     print("Process Complete! Please refer to the GeneratedPNGs directory for your images")
     return
 
