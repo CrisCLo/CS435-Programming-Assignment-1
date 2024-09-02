@@ -1,2 +1,31 @@
-Description of Design Decisions:
+Algorithm and Design Description:
 
+Design Decisions:
+
+The major components of the algorithmic design was the use of a stack, regular expressions
+the Pillow python library, and the use of glob and os. Firstly, the way in which tags in XML work
+reminded me heavily of the classic "parentheses matching" problem, given that tags open and close
+in a similar way that parentheses do. However, tags in XML are more complicated to identify than
+parentheses, but they all follow a similar pattern. This made me think of using regular expressions
+since it would be much easier to identify tags using them than any other method. Once the tags
+are identified, I extract the bounds and group them in tuples to supply to the drawing functions
+from Image and ImageDraw. This function was instrumental to annotate the screenshots. Lastly,
+I figured out how to process the directory of given screenshots to match each XML file to 
+its corresponding png using the glob and os modules. These modules were extremely helpful in
+retrieving all of the xml and png files to then match them and save the annotated screenshots
+with the same file name pattern and include "_highlighted" at the end to indicate it is annotated.
+These also were helpful to save the new files in the "GeneratedPNGS" directory.
+
+Algorithm Summary:
+
+The tool begins by retrieving all of the xml files from the input directory using the glob and 
+os modules, which find the file name patterns without the extensions and match them 
+with their corresponding png files. Once matched, the leaf components are retrieved from the xml
+file, mainly utilizing regular expressions and a stack to accurately find all of the tags in the 
+file, match them with closing tags, and find the bounds based on their pattern as well. Once the
+leaf component bounds are retrieved, they are passed into the highlighting function alongside the
+png and the highlight function uses Image and ImageDraw to draw rectangles using the given bounds
+as coordinates for the drawings. Once highlighted, the glob and os modules are used to create 
+a file name for the highlighted png that matches the xml and original png counterparts to then save
+them into the "GeneratedPNGs" directory. This process repeats for every xml/png file pair in the
+input directory until they are all highlighted.
