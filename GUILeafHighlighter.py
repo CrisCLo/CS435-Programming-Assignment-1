@@ -106,6 +106,7 @@ def MatchandHighlight(directory = 'Programming-Assignment-Data\Programming-Assig
         else:
             # if png doesn't exist, notify user
             print(pngmatchname,"does not exist in input Directory! Please name file accordingly for highlighting")
+    print("Process Complete! Please refer to the GeneratedPNGs directory for your images")
     return
 
 
