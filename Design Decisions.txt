@@ -22,10 +22,11 @@ The tool begins by retrieving all of the xml files from the input directory usin
 os modules, which find the file name patterns without the extensions and match them 
 with their corresponding png files. Once matched, the leaf components are retrieved from the xml
 file, mainly utilizing regular expressions and a stack to accurately find all of the tags in the 
-file, match them with closing tags, and find the bounds based on their pattern as well. Once the
-leaf component bounds are retrieved, they are passed into the highlighting function alongside the
-png and the highlight function uses Image and ImageDraw to draw rectangles using the given bounds
-as coordinates for the drawings. Once highlighted, the glob and os modules are used to create 
-a file name for the highlighted png that matches the xml and original png counterparts to then save
-them into the "GeneratedPNGs" directory. This process repeats for every xml/png file pair in the
-input directory until they are all highlighted.
+file, match them with closing tags, and find the bounds based on their pattern as well. 
+The function handles nesting by popping the stack for every opening, and self-closing tag found.
+Once the leaf component bounds are retrieved, they are passed into the highlighting function 
+alongside the png and the highlight function uses Image and ImageDraw to draw rectangles using 
+the given bounds as coordinates for the drawings. Once highlighted, the glob and os modules are 
+used to create a file name for the highlighted png that matches the xml and original png 
+counterparts to then save them into the "GeneratedPNGs" directory. This process repeats for 
+every xml/png file pair in the input directory until they are all highlighted.
